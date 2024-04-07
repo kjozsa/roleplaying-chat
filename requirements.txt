@@ -1,3 +1,5 @@
 streamlit
 ollama
+loguru
+pytest
 

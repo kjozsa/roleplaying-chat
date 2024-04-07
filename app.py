@@ -1,7 +1,7 @@
 import streamlit as st
 from ollama import chat
 from loguru import logger
-
+import re
 
 available_models = [
     'openhermes',
@@ -65,10 +65,14 @@ def main():
         answer1 = ask(model1, system_prompt1, pre_prompt1, question1)
         st.write(f":blue[Priest says:] {answer1}")
 
-        qp2 = answer1
+        qp2 = sanitize(answer1)
 
         answer2 = ask(model2, system_prompt2, pre_prompt2, qp2)
         st.write(f":blue[Teacher says:] {answer2}")
+
+
+def sanitize(question):
+    return re.sub(r"\([^)]*\)", "", question)
 
 
 if __name__ == "__main__":
