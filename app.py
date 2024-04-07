@@ -25,10 +25,11 @@ def ask(model, system_prompt, pre_prompt, question):
             'content': f"{question}",
         },
     ]
-    logger.debug(f"<< {model} << {messages}")
+    logger.debug(f"<< {model} << {question}")
     response = chat(model=model, messages=messages)
-    logger.debug(f">> {model} >> {messages}")
-    return response['message']['content']
+    answer = response['message']['content']
+    logger.debug(f">> {model} >> {answer}")
+    return answer
 
 
 class Actor:
@@ -46,7 +47,7 @@ class Actor:
 
 
 def setup(question):
-    pp1 = pp2 = pp3 = "Ask the other two by always starting your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses."
+    pp1 = pp2 = pp3 = "Ask the other two by always starting your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses. SAY ONLY ONE SINGLE SENTENCE!"
     priest = Actor("Priest", available_models[0], "You are the Priest. There are 3 people standing in a circle: the Priest (that's you), the Teacher and the Kid.", pp1)
     teacher = Actor("Teacher", available_models[0], "You are the Teacher. There are 3 people standing in a circle: the Priest, the Teacher (that's you) and the Kid.", pp2)
     kid = Actor("Kid", available_models[0], "You are the Kid. There are 3 people standing in a circle: the Priest, the Teacher and the Kid (that's you).", pp3)
@@ -64,7 +65,7 @@ def setup(question):
 
 
 def main():
-    question = setup("Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after! SAY ONLY ONE SINGLE SENTENCE!")
+    question = setup("Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after!")
 
     role = target(question)
     for count, _ in enumerate(range(10)):
