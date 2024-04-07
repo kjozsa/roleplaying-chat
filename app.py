@@ -41,7 +41,7 @@ def main():
     st.set_page_config(layout="wide")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.title("the Priest")
+        st.title("the Priest,")
         model1 = st.selectbox(key="model1", label="model", options=available_models)
         system_prompt1 = st.text_area(key="sp1", label="system-prompt", value=sp1)
         pre_prompt1 = st.text_area(key="pp1", label="pre-prompt", value=pp1)
@@ -55,7 +55,7 @@ def main():
         # question2 = st.text_area(key="q2", label="question", value=qp2)
 
     with col3:
-        st.title("the Kid")
+        st.title("and the Kid")
         model3 = st.selectbox(key="model3", label="model", options=available_models)
         system_prompt3 = st.text_area(key="sp3", label="system-prompt", value=sp3)
         pre_prompt3 = st.text_area(key="pp3", label="pre-prompt", value=pp3)

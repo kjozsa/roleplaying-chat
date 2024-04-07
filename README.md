@@ -1,3 +1,2 @@
-$ uv pip install -r requirements.txt
-$ streamlit run app.py
-
+    $ uv pip install -r requirements.txt
+    $ streamlit run app.py
