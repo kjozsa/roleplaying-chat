@@ -27,6 +27,7 @@ def ask(model, system_prompt, pre_prompt, question):
     ]
     logger.debug(f"<< {model} << {messages}")
     response = chat(model=model, messages=messages)
+    logger.debug(f">> {model} >> {messages}")
     return response['message']['content']
 
 

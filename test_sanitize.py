@@ -3,6 +3,8 @@ from app import sanitize
 
 def test_sanitize():
     assert '' == sanitize('')
+    assert '' == sanitize('((a)')
+    assert '(' == sanitize('(')
     assert 'qwertyui' == sanitize('qwertyui')
     assert 'qwertyui ' == sanitize('qwertyui (abcdef)')
     assert 'qwertyui  poiuy' == sanitize('qwertyui (abcdef) poiuy')
