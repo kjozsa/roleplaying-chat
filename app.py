@@ -68,14 +68,14 @@ def main():
     question = setup("Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after!")
 
     role = target(question)
-    for count, _ in enumerate(range(10)):
-        with st.spinner(f"Asking {role}..."):
+    max_steps = 10
+    for step, _ in enumerate(range(max_steps), start=1):
+        with st.spinner(f"{step}/{max_steps} Asking {role}..."):
             actor = Actor[role]
             answer = ask(actor.model, actor.system_prompt, actor.pre_prompt, question)
             st.write(f":blue[{actor.role} says:] {answer}")
             question = sanitize(answer)
             role = target(question)
-            count += 1
 
 
 def target(question):
