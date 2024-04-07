@@ -43,24 +43,24 @@ def main():
     col1, col2, col3 = st.columns(3)
     with col1:
         st.title("the Priest,")
-        model1 = st.selectbox(key="model1", label="model", options=available_models)
-        system_prompt1 = st.text_area(key="sp1", label="system-prompt", value=sp1)
-        pre_prompt1 = st.text_area(key="pp1", label="pre-prompt", value=pp1)
-        question1 = st.text_area(key="q1", label="question", value=qp1)
+        model1 = st.selectbox("model", available_models, key="model1")
+        system_prompt1 = st.text_area("system-prompt", sp1, key="sp1")
+        pre_prompt1 = st.text_area("pre-prompt", pp1, key="pp1")
+        question1 = st.text_area("question", qp1, key="qp1")
 
     with col2:
         st.title("the Teacher")
-        model2 = st.selectbox(key="model2", label="model", options=available_models)
-        system_prompt2 = st.text_area(key="sp2", label="system-prompt", value=sp2)
-        pre_prompt2 = st.text_area(key="pp2", label="pre-prompt", value=pp2)
-        # question2 = st.text_area(key="q2", label="question", value=qp2)
+        model2 = st.selectbox("model", available_models, key="model2")
+        system_prompt2 = st.text_area("system-prompt", sp2, key="sp2")
+        pre_prompt2 = st.text_area("pre-prompt", pp2, key="pp2")
+        # question2 = st.text_area("question", qp2, key="qp2")
 
     with col3:
         st.title("and the Kid")
-        model3 = st.selectbox(key="model3", label="model", options=available_models)
-        system_prompt3 = st.text_area(key="sp3", label="system-prompt", value=sp3)
-        pre_prompt3 = st.text_area(key="pp3", label="pre-prompt", value=pp3)
-        # question3 = st.text_area(key="q3", label="question", value=qp3)
+        model3 = st.selectbox("model", available_models, key="model3")
+        system_prompt3 = st.text_area("system-prompt", sp3, key="sp3")
+        pre_prompt3 = st.text_area("pre-prompt", pp3, key="pp3")
+        # question3 = st.text_area("question", qp3, key="qp3")
 
     with st.spinner("Thinking..."):
         answer1 = ask(model1, system_prompt1, pre_prompt1, question1)
