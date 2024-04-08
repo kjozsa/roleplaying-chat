@@ -3,4 +3,5 @@ ollama
 loguru
 pytest
 transformers
+torch
 
