@@ -70,7 +70,7 @@ def main():
     role = target(question)
     max_steps = 10
     for step, _ in enumerate(range(max_steps), start=1):
-        with st.spinner(f"{step}/{max_steps} Asking {role}..."):
+        with st.spinner(f"({step}/{max_steps}) Asking {role}..."):
             actor = Actor[role]
             answer = ask(actor.model, actor.system_prompt, actor.pre_prompt, question)
             st.write(f":blue[{actor.role} says:] {answer}")
@@ -79,8 +79,7 @@ def main():
 
 
 def target(question):
-    return re.split(r'\s|,|:', question)[0]
-
+    return re.split(r'\s|,|:', question.strip())[0].strip()
 
 def sanitize(question):
     return re.sub(r"\([^)]*\)", "", question)
