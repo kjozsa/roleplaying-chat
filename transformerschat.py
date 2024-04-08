@@ -18,7 +18,7 @@ def load():
 model, tokenizer = load()
 
 
-def ask(model, system_prompt, pre_prompt, question):
+def ask(_, system_prompt, pre_prompt, question):
     messages = [
         {
             'role': 'system',
@@ -29,9 +29,9 @@ def ask(model, system_prompt, pre_prompt, question):
             'content': f"{question}",
         },
     ]
-    logger.debug(f"<< {model} << {question}")
+    logger.debug(f"<< {openhermes} << {question}")
     inputs = tokenizer(question, return_tensors="pt", return_attention_mask=False)
     outputs = model.generate(**inputs, max_length=200)
     answer = tokenizer.batch_decode(outputs)[0]
-    logger.debug(f">> {model} >> {answer}")
+    logger.debug(f">> {openhermes} >> {answer}")
     return answer
