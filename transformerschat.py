@@ -10,8 +10,8 @@ def models():
 
 def load():
     torch.set_default_device("cuda")
-    model = AutoModelForCausalLM.from_pretrained("microsoft/phi-2", torch_dtype="auto", trust_remote_code=True)
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/phi-2", trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained("openhermes", torch_dtype="auto", trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained("openhermes", trust_remote_code=True).to("cuda")
     return (model, tokenizer)
 
 
