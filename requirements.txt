@@ -2,4 +2,5 @@ streamlit
 ollama
 loguru
 pytest
+transformers
 
