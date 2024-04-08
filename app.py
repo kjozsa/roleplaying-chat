@@ -1,7 +1,8 @@
-import streamlit as st
-import ollama
-from loguru import logger
 import re
+
+import ollama
+import streamlit as st
+from loguru import logger
 
 available_models = sorted([x['model'] for x in ollama.list()['models']], key=lambda x: (not x.startswith("openhermes"), x))
 
@@ -59,19 +60,23 @@ def setup(question):
 def main():
     question = setup("Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after!")
 
-    role = target(question)
-    max_steps = 10
+    actor = target(sanitize(question))
+    max_steps = 1
     for step, _ in enumerate(range(max_steps), start=1):
-        with st.spinner(f"({step}/{max_steps}) Asking {role}..."):
-            actor = Actor[role]
+        with st.spinner(f"({step}/{max_steps}) Asking {actor.role}..."):
             answer = ask(actor.model, actor.system_prompt, actor.pre_prompt, question)
             st.write(f":blue[{actor.role} says:] {answer}")
             question = sanitize(answer)
-            role = target(question)
+            actor = target(question)
 
 
-def target(question):
-    return re.split(r'\s|,|:', question.strip())[0].strip()
+def target(question) -> Actor:
+    try:
+        role = re.split(r'\s|,|:', question.strip())[0].strip()
+        return Actor[role]
+    except KeyError:
+        logger.warning(f"no actor found in question: {question}, trying to return the first actor")
+        return next(iter(Actor.actors.items()))[1]
 
 
 def sanitize(question):
