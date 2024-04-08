@@ -5,13 +5,13 @@ import spaces
 
 
 def models():
-    return ["openhermes"]
+    return ["teknium/OpenHermes-2.5-Mistral-7B"]
 
 
 def load():
     torch.set_default_device("cuda")
-    model = AutoModelForCausalLM.from_pretrained("openhermes", torch_dtype="auto", trust_remote_code=True)
-    tokenizer = AutoTokenizer.from_pretrained("openhermes", trust_remote_code=True).to("cuda")
+    model = AutoModelForCausalLM.from_pretrained(models()[0], torch_dtype="auto", trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(models()[0], trust_remote_code=True).to("cuda")
     return (model, tokenizer)
 
 
