@@ -1,17 +1,9 @@
 import streamlit as st
-from ollama import chat
+import ollama
 from loguru import logger
 import re
 
-available_models = [
-    'openhermes',
-    'deepseek-coder',
-    'deepseek-coder:6.7b',
-    'falcon:7b',
-    'mistral:7b',
-    'phi',
-    'starling-lm'
-]
+available_models = sorted([x['model'] for x in ollama.list()['models']], key=lambda x: (not x.startswith("openhermes"), x))
 
 
 def ask(model, system_prompt, pre_prompt, question):
@@ -26,7 +18,7 @@ def ask(model, system_prompt, pre_prompt, question):
         },
     ]
     logger.debug(f"<< {model} << {question}")
-    response = chat(model=model, messages=messages)
+    response = ollama.chat(model=model, messages=messages)
     answer = response['message']['content']
     logger.debug(f">> {model} >> {answer}")
     return answer
@@ -80,6 +72,7 @@ def main():
 
 def target(question):
     return re.split(r'\s|,|:', question.strip())[0].strip()
+
 
 def sanitize(question):
     return re.sub(r"\([^)]*\)", "", question)
