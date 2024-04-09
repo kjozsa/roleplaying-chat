@@ -4,7 +4,7 @@ import os
 
 
 def models():
-    return ["openhermes-2.5-mistral-7b.Q4_K_M.gguf"]
+    return ["mistral-7b-openorca.Q5_K_M.gguf"]
 
 
 def load():
@@ -38,11 +38,11 @@ def ask(_, system_prompt, pre_prompt, question):
         {'role': 'system', 'content': f"{system_prompt} {pre_prompt}", },
         {'role': 'user', 'content': f"{question}", },
     ]
-    logger.debug(f"<< openhermes << {messages}")
-    # inputs = tokenizer.apply_chat_template(messages, return_tensors="pt")
-    inputs = tokenizer.apply_chat_template(messages, return_tensors="pt")
+    logger.debug(f"<< transformers << {messages}")
+    inputs = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    # inputs = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
 
     outputs = model.generate(inputs, max_length=200)
     answer = tokenizer.batch_decode(outputs)[0]
-    logger.debug(f">> openhermes >> {answer}")
+    logger.debug(f">> transformers >> {answer}")
     return answer
