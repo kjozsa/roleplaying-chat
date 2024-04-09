@@ -3,6 +3,6 @@ streamlit
 ollama
 loguru
 pytest
-transformers
 torch
+spaces
 

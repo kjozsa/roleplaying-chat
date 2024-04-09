@@ -5,7 +5,7 @@ colorFrom: yellow
 colorTo: red
 sdk: streamlit
 sdk_version: 1.33.0
-app_file: app.py
+app_file: chat/app.py
 pinned: false
 ---
 

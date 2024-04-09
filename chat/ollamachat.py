@@ -8,14 +8,8 @@ def models():
 
 def ask(model, system_prompt, pre_prompt, question):
     messages = [
-        {
-            'role': 'system',
-            'content': f"{system_prompt} {pre_prompt}",
-        },
-        {
-            'role': 'user',
-            'content': f"{question}",
-        },
+        {'role': 'system', 'content': f"{system_prompt} {pre_prompt}", },
+        {'role': 'user', 'content': f"{question}", },
     ]
     logger.debug(f"<< {model} << {question}")
     response = ollama.chat(model=model, messages=messages)

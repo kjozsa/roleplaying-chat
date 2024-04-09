@@ -1,4 +1,4 @@
-from app import sanitize, target, Actor
+from app import sanitize, target
 
 
 def test_sanitize():
