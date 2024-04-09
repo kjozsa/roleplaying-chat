@@ -1,4 +1,4 @@
-from app import sanitize, target
+from chat import sanitize, target
 
 
 def test_sanitize():
@@ -8,6 +8,7 @@ def test_sanitize():
     assert 'qwertyui' == sanitize('qwertyui')
     assert 'qwertyui ' == sanitize('qwertyui (abcdef)')
     assert 'qwertyui  poiuy' == sanitize('qwertyui (abcdef) poiuy')
+    assert 'qwertyui  poiuy' == sanitize('Priest says: qwertyui (abcdef) poiuy')
 
     assert '"Teacher, I heard about a fascinating story from someone who lives in the city. Can you guess who it might be?" ' == sanitize(
         '"Teacher, I heard about a fascinating story from someone who lives in the city. Can you guess who it might be?" (I want to find out if the Teacher can make any...)')
