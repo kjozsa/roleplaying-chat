@@ -2,8 +2,10 @@ import re
 
 import streamlit as st
 from loguru import logger
-# from .togetherchat import ask, models
-from .ollamachat import ask, models
+
+from .togetherchat import ask, models
+
+# from .ollamachat import ask, models
 
 # from .transformerschat import ask, models
 
@@ -21,9 +23,8 @@ class Scenario:
 class Actor:
     actors = {}
 
-    def __init__(self, name, model, system_prompt):
+    def __init__(self, name, system_prompt):
         self.name = name
-        self.model = model
         self.system_prompt = system_prompt
         Actor.actors[name] = self
 
@@ -56,17 +57,29 @@ def setup(scenario):
 
 
 def main():
+    # scenario = Scenario(
+    #     "The Small Village scenario", [
+    #         Actor("Priest", "You are the Priest. There are 3 people standing in a circle: the Priest (that's you), the Teacher and the Kid."),
+    #         Actor("Teacher", "You are the Teacher. There are 3 people standing in a circle: the Priest, the Teacher (that's you) and the Kid."),
+    #         Actor("Kid", "You are the Kid. There are 3 people standing in a circle: the Priest, the Teacher and the Kid (that's you).")
+    #     ],
+    #     "Answer questions as precisely as you can! If you want to ask anyone, always start your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses. SAY ONLY ONE SINGLE SENTENCE! Do not say 'sure, here is my response' or anything such)",
+    #     "Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after!")
+
     scenario = Scenario(
-        "The Small Village scenario", [
-            Actor("Priest", available_models[0], "You are the Priest. There are 3 people standing in a circle: the Priest (that's you), the Teacher and the Kid."),
-            Actor("Teacher", available_models[0], "You are the Teacher. There are 3 people standing in a circle: the Priest, the Teacher (that's you) and the Kid."),
-            Actor("Kid", available_models[0], "You are the Kid. There are 3 people standing in a circle: the Priest, the Teacher and the Kid (that's you).")
+        "The Number Guess Game", [
+            Actor("Magician", "You are the Magician, and there is a Player standing next to you. Ask the Player about the secret number he thought of, guessing the number through questions."),
+            Actor("Player", "You are the Player and there is a Magician next to you. Think of a secret number between 1 and 100. Answer received questions but do not tell the number directly."),
         ],
-        "Answer questions as precisely as you can! If you want to ask anyone, always start your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses. SAY ONLY ONE SINGLE SENTENCE! Do not say 'sure, here is my response' or anything such)",
-        "Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after!")
+        "Always start your sentence with the name of the other person. Share your inner thoughts inside parentheses. NEVER start your sentence with your own name!",
+        "Find out the secret number!"
+    )
 
     model, max_steps = setup(scenario)
+    main_loop(max_steps, model, scenario)
 
+
+def main_loop(max_steps, model, scenario):
     questioner = None
     question = scenario.task
     actor = target(question)
