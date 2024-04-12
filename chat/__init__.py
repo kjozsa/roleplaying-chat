@@ -2,7 +2,7 @@ import re
 
 import streamlit as st
 from loguru import logger
-from .ollamachat import ask, models
+from .togetherchat import ask, models
 
 # from .transformerschat import ask, models
 
@@ -24,7 +24,7 @@ class Actor:
 
 
 def setup(question):
-    pp1 = pp2 = pp3 = "Answer questions as precisely as you can! If you want to ask anyone, always start your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses. SAY ONLY ONE SINGLE SENTENCE!"
+    pp1 = pp2 = pp3 = "Answer questions as precisely as you can! If you want to ask anyone, always start your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses. SAY ONLY ONE SINGLE SENTENCE! Do not say 'sure, here is my response' or anything such)"
     priest = Actor("Priest", available_models[0], "You are the Priest. There are 3 people standing in a circle: the Priest (that's you), the Teacher and the Kid.", pp1)
     teacher = Actor("Teacher", available_models[0], "You are the Teacher. There are 3 people standing in a circle: the Priest, the Teacher (that's you) and the Kid.", pp2)
     kid = Actor("Kid", available_models[0], "You are the Kid. There are 3 people standing in a circle: the Priest, the Teacher and the Kid (that's you).", pp3)
