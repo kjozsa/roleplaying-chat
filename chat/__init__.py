@@ -3,10 +3,8 @@ import re
 import streamlit as st
 from loguru import logger
 
-from .togetherchat import ask, models
-
-# from .ollamachat import ask, models
-
+from .ollamachat import ask, models
+# from .togetherchat import ask, models
 # from .transformerschat import ask, models
 
 available_models = models()
