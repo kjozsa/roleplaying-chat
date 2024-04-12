@@ -9,51 +9,63 @@ from .togetherchat import ask, models
 available_models = models()
 
 
+class Scenario:
+    def __init__(self, title, actors, task):
+        self.title = title
+        self.actors = actors
+        self.task = task
+
+
 class Actor:
     actors = {}
 
-    def __init__(self, role, model, system_prompt, pre_prompt):
-        self.role = role
+    def __init__(self, name, model, system_prompt, pre_prompt):
+        self.name = name
         self.model = model
         self.system_prompt = system_prompt
         self.pre_prompt = pre_prompt
-        Actor.actors[role] = self
+        Actor.actors[name] = self
 
     def __class_getitem__(cls, item):
         return cls.actors[item]
 
 
-def setup(question):
-    pp1 = pp2 = pp3 = "Answer questions as precisely as you can! If you want to ask anyone, always start your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses. SAY ONLY ONE SINGLE SENTENCE! Do not say 'sure, here is my response' or anything such)"
-    priest = Actor("Priest", available_models[0], "You are the Priest. There are 3 people standing in a circle: the Priest (that's you), the Teacher and the Kid.", pp1)
-    teacher = Actor("Teacher", available_models[0], "You are the Teacher. There are 3 people standing in a circle: the Priest, the Teacher (that's you) and the Kid.", pp2)
-    kid = Actor("Kid", available_models[0], "You are the Kid. There are 3 people standing in a circle: the Priest, the Teacher and the Kid (that's you).", pp3)
+def setup(scenario):
     st.set_page_config(layout="wide")
-    col1, col2, col3 = st.columns(3)
-    for actor, col in [(priest, col1), (teacher, col2), (kid, col3)]:
+    columns = st.columns(len(scenario.actors))
+
+    for actor, col in zip(scenario.actors, columns):
         with col:
-            role = actor.role
-            st.title(role)
-            actor.model = st.selectbox("model", available_models, key=f"{role}-model")
-            actor.system_prompt = st.text_area("system-prompt", actor.system_prompt, key=f"{role}-sp")
-            actor.pre_prompt = st.text_area("pre-prompt", actor.pre_prompt, key=f"{role}-pp")
+            name = actor.name
+            st.title(name)
+            actor.model = st.selectbox("model", available_models, key=f"{name}-model")
+            actor.system_prompt = st.text_area("system-prompt", actor.system_prompt, key=f"{name}-sp")
+            actor.pre_prompt = st.text_area("pre-prompt", actor.pre_prompt, key=f"{name}-pp")
     max_steps = st.slider("max-steps", min_value=1, max_value=10, value=6, key="max-steps")
-    st.text_input("Priest's task", f"{question}")
-    return question, max_steps
+    st.text_input(f"{scenario.actors[0].name}'s task", f"{scenario.task}")
+    return max_steps
 
 
 def main():
-    question, max_steps = setup("Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after!")
-    questioner = None
+    pre_prompt = "Answer questions as precisely as you can! If you want to ask anyone, always start your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses. SAY ONLY ONE SINGLE SENTENCE! Do not say 'sure, here is my response' or anything such)"
+    scenario = Scenario("Priest-Teacher-Kid", [
+        Actor("Priest", available_models[0], "You are the Priest. There are 3 people standing in a circle: the Priest (that's you), the Teacher and the Kid.", pre_prompt),
+        Actor("Teacher", available_models[0], "You are the Teacher. There are 3 people standing in a circle: the Priest, the Teacher (that's you) and the Kid.", pre_prompt),
+        Actor("Kid", available_models[0], "You are the Kid. There are 3 people standing in a circle: the Priest, the Teacher and the Kid (that's you).", pre_prompt)
+    ], "Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after!")
 
-    actor = target(sanitize(question))
+    max_steps = setup(scenario)
+
+    questioner = None
+    question = scenario.task
+    actor = target(question)
     for step, _ in enumerate(range(max_steps), start=1):
-        with st.spinner(f"({step}/{max_steps}) Asking {actor.role}..."):
+        with st.spinner(f"({step}/{max_steps}) Asking {actor.name}..."):
             extended = f"{questioner} asks: {question}" if questioner else question
             answer = ask(actor.model, actor.system_prompt, actor.pre_prompt, extended)
-            st.write(f":blue[{actor.role} says:] {answer}")
+            st.write(f":blue[{actor.name} says:] {answer}")
             question = sanitize(answer)
-            questioner = actor.role
+            questioner = actor.name
             actor = target(question)
 
 
