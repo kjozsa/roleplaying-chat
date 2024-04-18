@@ -43,7 +43,7 @@ def setup(scenario):
     col1, col2 = st.columns([1, 4])
     with col1:
         model = st.selectbox("model", available_models)
-        temperature = st.slider("temperature", min_value=0.0, max_value=1.0, value=0.7, key="temperature")
+        temperature = st.slider("temperature", min_value=0.0, max_value=2.0, value=0.7, key="temperature")
         max_steps = st.slider("max-steps", min_value=1, max_value=10, value=6, key="max-steps")
     with col2:
         st.text_area("pre-prompt", scenario.pre_prompt)
