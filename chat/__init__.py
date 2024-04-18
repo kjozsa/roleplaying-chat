@@ -5,6 +5,7 @@ from loguru import logger
 
 # from .ollamachat import ask, models
 from .togetherchat import ask, models
+
 # from .transformerschat import ask, models
 
 available_models = models()
@@ -57,6 +58,16 @@ def main():
     st.set_page_config(layout="wide")
     scenarios = [
         Scenario(
+            "Murder in the library", [
+                Actor("Librarian", "You are the librarian. Today morning you found a dead body of an old lady laying on the floor. There is a visitor who just entered and a cleaning lady is standing in the corner."),
+                Actor("Visitor",
+                      "You are a visitor in the library. You wish to borrow an interesting book for two weeks to read on your upcoming vacation. There is a librarian who you can ask and a cleaning lady standing in the corner."),
+                Actor("Cleaning lady", "You are the cleaning lady in the library. Today you came to work with a serious headache. There is a visitor and a librarian in the room."),
+            ],
+            "You are an actor in this roleplaying game. Your full response is said out loud and other people hear it. ",
+            "Find out who committed the murder! You must find the clues by asking the two other people in the room."
+        ),
+        Scenario(
             "The Small Village scenario", [
                 Actor("Priest", "You are the Priest. There are 3 people standing in a circle: the Priest (that's you), the Teacher and the Kid."),
                 Actor("Teacher", "You are the Teacher. There are 3 people standing in a circle: the Priest, the Teacher (that's you) and the Kid."),
@@ -72,7 +83,8 @@ def main():
             ],
             "Always start your sentence with the name of the other person. Share your inner thoughts inside parentheses. NEVER start your sentence with your own name!",
             "Find out the secret number!"
-        )]
+        )
+    ]
 
     scenario = st.selectbox("scenario", scenarios)
     model, max_steps, temperature = setup(scenario)
@@ -93,15 +105,34 @@ def main_loop(max_steps, model, scenario, temperature):
             actor = target(scenario, question)
 
 
+def closest_to_start(long_string, substrings):
+    logger.debug(f"looking for {substrings} in {long_string}")
+    closest_index = len(long_string)
+    closest_substring = None
+    for substring in substrings:
+        index = long_string.find(substring)
+        if index != -1 and index < closest_index:
+            closest_index = index
+            closest_substring = substring
+    return closest_substring
+
+
 # noinspection PyTypeChecker
 def target(scenario: Scenario, question) -> Actor:
     try:
-        role = re.split(r'\s|,|:', question.strip())[0].strip()
-        logger.debug(f"finding actor with role: {role} in actors: {[actor.name for actor in scenario.actors]}")
-        return [actor for actor in scenario.actors if actor.name == role][0]
+        name = closest_to_start(question, [actor.name for actor in scenario.actors])
+        return [actor for actor in scenario.actors if actor.name == name][0]
     except IndexError:
         logger.warning(f"no actor found in question: {question}, trying to return the first actor")
         return scenario.actors[0]
+
+    # try:
+    #     role = re.split(r'\s|,|:', question.strip())[0].strip()
+    #     logger.debug(f"finding actor with role: {role} in actors: {[actor.name for actor in scenario.actors]}")
+    #     return [actor for actor in scenario.actors if actor.name == role][0]
+    # except IndexError:
+    #     logger.warning(f"no actor found in question: {question}, trying to return the first actor")
+    #     return scenario.actors[0]
 
 
 def sanitize(question):
