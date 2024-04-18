@@ -3,8 +3,9 @@ import re
 import streamlit as st
 from loguru import logger
 
-from .ollamachat import ask, models
-# from .togetherchat import ask, models
+# from .ollamachat import ask, models
+from .togetherchat import ask, models
+
 # from .transformerschat import ask, models
 
 available_models = models()
@@ -17,6 +18,9 @@ class Scenario:
         self.pre_prompt = pre_prompt
         self.task = task
 
+    def __str__(self):
+        return self.title
+
 
 class Actor:
     actors = {}
@@ -24,14 +28,9 @@ class Actor:
     def __init__(self, name, system_prompt):
         self.name = name
         self.system_prompt = system_prompt
-        Actor.actors[name] = self
-
-    def __class_getitem__(cls, item):
-        return cls.actors[item]
 
 
 def setup(scenario):
-    st.set_page_config(layout="wide")
     st.title(scenario.title)
     columns = st.columns(len(scenario.actors))
     for actor, col in zip(scenario.actors, columns):
@@ -55,24 +54,27 @@ def setup(scenario):
 
 
 def main():
-    # scenario = Scenario(
-    #     "The Small Village scenario", [
-    #         Actor("Priest", "You are the Priest. There are 3 people standing in a circle: the Priest (that's you), the Teacher and the Kid."),
-    #         Actor("Teacher", "You are the Teacher. There are 3 people standing in a circle: the Priest, the Teacher (that's you) and the Kid."),
-    #         Actor("Kid", "You are the Kid. There are 3 people standing in a circle: the Priest, the Teacher and the Kid (that's you).")
-    #     ],
-    #     "Answer questions as precisely as you can! If you want to ask anyone, always start your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses. SAY ONLY ONE SINGLE SENTENCE! Do not say 'sure, here is my response' or anything such)",
-    #     "Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after!")
+    st.set_page_config(layout="wide")
+    scenarios = [
+        Scenario(
+            "The Small Village scenario", [
+                Actor("Priest", "You are the Priest. There are 3 people standing in a circle: the Priest (that's you), the Teacher and the Kid."),
+                Actor("Teacher", "You are the Teacher. There are 3 people standing in a circle: the Priest, the Teacher (that's you) and the Kid."),
+                Actor("Kid", "You are the Kid. There are 3 people standing in a circle: the Priest, the Teacher and the Kid (that's you).")
+            ],
+            "Answer questions as precisely as you can! If you want to ask anyone, always start your sentence with their role. Never start your sentence with your own name. Share your inner thoughts inside parentheses. SAY ONLY ONE SINGLE SENTENCE! Do not say 'sure, here is my response' or anything such)",
+            "Priest, your task is to figure out their names and where they live. Do not ask directly, they must not realize what information you are after!"),
 
-    scenario = Scenario(
-        "The Number Guess Game", [
-            Actor("Magician", "You are the Magician, and there is a Player standing next to you. Ask the Player about the secret number he thought of, guessing the number through questions."),
-            Actor("Player", "You are the Player and there is a Magician next to you. Think of a secret number between 1 and 100. Answer received questions but do not tell the number directly."),
-        ],
-        "Always start your sentence with the name of the other person. Share your inner thoughts inside parentheses. NEVER start your sentence with your own name!",
-        "Find out the secret number!"
-    )
+        Scenario(
+            "The Number Guess Game", [
+                Actor("Magician", "You are the Magician, and there is a Player standing next to you. Ask the Player about the secret number he thought of, guessing the number through questions."),
+                Actor("Player", "You are the Player and there is a Magician next to you. Think of a secret number between 1 and 100. Answer received questions but do not tell the number directly."),
+            ],
+            "Always start your sentence with the name of the other person. Share your inner thoughts inside parentheses. NEVER start your sentence with your own name!",
+            "Find out the secret number!"
+        )]
 
+    scenario = st.selectbox("scenario", scenarios)
     model, max_steps = setup(scenario)
     main_loop(max_steps, model, scenario)
 
@@ -80,7 +82,7 @@ def main():
 def main_loop(max_steps, model, scenario):
     questioner = None
     question = scenario.task
-    actor = target(question)
+    actor = target(scenario, question)
     for step, _ in enumerate(range(max_steps), start=1):
         with st.spinner(f"({step}/{max_steps}) Asking {actor.name}..."):
             extended = f"{questioner} asks: {question}" if questioner else question
@@ -88,17 +90,18 @@ def main_loop(max_steps, model, scenario):
             st.write(f":blue[{actor.name} says:] {answer}")
             question = sanitize(answer)
             questioner = actor.name
-            actor = target(question)
+            actor = target(scenario, question)
 
 
 # noinspection PyTypeChecker
-def target(question) -> Actor:
+def target(scenario: Scenario, question) -> Actor:
     try:
         role = re.split(r'\s|,|:', question.strip())[0].strip()
-        return Actor[role]
-    except KeyError:
+        logger.debug(f"finding actor with role: {role} in actors: {[actor.name for actor in scenario.actors]}")
+        return [actor for actor in scenario.actors if actor.name == role][0]
+    except IndexError:
         logger.warning(f"no actor found in question: {question}, trying to return the first actor")
-        return next(iter(Actor.actors.items()))[1]
+        return scenario.actors[0]
 
 
 def sanitize(question):

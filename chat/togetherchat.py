@@ -13,6 +13,9 @@ client = OpenAI(
 def models():
     return [
         'teknium/OpenHermes-2p5-Mistral-7B',
+        'META-LLAMA/LLAMA-3-8B-CHAT-HF',
+        'MICROSOFT/WIZARDLM-2-8X22',
+        'TOGETHERCOMPUTER/REDPAJAMA-INCITE-7B-CHAT',
         'meta-llama/Llama-2-13b-chat-hf',
         'meta-llama/Llama-2-70b-chat-hf',
         'Open-Orca/Mistral-7B-OpenOrca',
