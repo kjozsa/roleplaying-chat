@@ -31,6 +31,19 @@ class Actor:
 
 
 def setup(scenario):
+    st.markdown(  # top margin hack
+        """
+            <style>
+                .appview-container .main .block-container {{
+                    padding-top: {padding_top}rem;
+                    padding-bottom: {padding_bottom}rem;
+                    }}
+
+            </style>""".format(
+            padding_top=1, padding_bottom=1
+        ),
+        unsafe_allow_html=True,
+    )
     st.title(scenario.title)
     columns = st.columns(len(scenario.actors))
     for actor, col in zip(scenario.actors, columns):
@@ -94,7 +107,7 @@ def main():
 def main_loop(max_steps, model, scenario, temperature):
     questioner = None
     question = scenario.task
-    actor = target(scenario, question)
+    actor = target(scenario, question, questioner)
     for step, _ in enumerate(range(max_steps), start=1):
         with st.spinner(f"({step}/{max_steps}) Asking {actor.name}..."):
             extended = f"{questioner} asks: {question}" if questioner else question
@@ -102,7 +115,7 @@ def main_loop(max_steps, model, scenario, temperature):
             st.write(f":blue[{actor.name} says:] {answer}")
             question = sanitize(answer)
             questioner = actor.name
-            actor = target(scenario, question)
+            actor = target(scenario, question, questioner)
 
 
 def closest_to_start(long_string, substrings):
@@ -110,7 +123,7 @@ def closest_to_start(long_string, substrings):
     closest_index = len(long_string)
     closest_substring = None
     for substring in substrings:
-        index = long_string.find(substring)
+        index = long_string.lower().find(substring.lower())
         if index != -1 and index < closest_index:
             closest_index = index
             closest_substring = substring
@@ -118,9 +131,9 @@ def closest_to_start(long_string, substrings):
 
 
 # noinspection PyTypeChecker
-def target(scenario: Scenario, question) -> Actor:
+def target(scenario: Scenario, question, questioner) -> Actor:
     try:
-        name = closest_to_start(question, [actor.name for actor in scenario.actors])
+        name = closest_to_start(question, [actor.name for actor in scenario.actors if actor.name != questioner])
         return [actor for actor in scenario.actors if actor.name == name][0]
     except IndexError:
         logger.warning(f"no actor found in question: {question}, trying to return the first actor")

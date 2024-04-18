@@ -15,7 +15,7 @@ def models():
         'teknium/OpenHermes-2p5-Mistral-7B',
         'META-LLAMA/LLAMA-3-8B-CHAT-HF',
         'microsoft/WizardLM-2-8x22B',
-        'WizardLM/WizardLM-13B-V1.2'
+        'WizardLM/WizardLM-13B-V1.2',
         'Qwen/Qwen1.5-14B-Chat',
         'togethercomputer/StripedHyena-Nous-7B',
         'meta-llama/Llama-2-13b-chat-hf',
@@ -27,7 +27,7 @@ def models():
 
 def ask(model, system_prompt, pre_prompt, question, temperature=0.7):
     messages = [
-        {'role': 'system', 'content': f"{system_prompt} {pre_prompt}"},
+        {'role': 'system', 'content': f"{pre_prompt} {system_prompt}"},
         {'role': 'user', 'content': f"{question}"},
     ]
     logger.debug(f"<< {model} << {question}")
