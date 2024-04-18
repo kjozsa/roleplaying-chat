@@ -33,7 +33,7 @@ def load():
 model, tokenizer = load()
 
 
-def ask(_, system_prompt, pre_prompt, question):
+def ask(_, system_prompt, pre_prompt, question, temperature=0.7):
     messages = [
         {'role': 'system', 'content': f"{system_prompt} {pre_prompt}", },
         {'role': 'user', 'content': f"{question}", },
@@ -42,7 +42,7 @@ def ask(_, system_prompt, pre_prompt, question):
     inputs = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     # inputs = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
 
-    outputs = model.generate(inputs, max_length=200)
+    outputs = model.generate(inputs, max_length=200, temperature=temperature)
     answer = tokenizer.batch_decode(outputs)[0]
     logger.debug(f">> transformers >> {answer}")
     return answer

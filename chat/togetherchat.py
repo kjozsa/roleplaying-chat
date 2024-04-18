@@ -23,14 +23,14 @@ def models():
     ]
 
 
-def ask(model, system_prompt, pre_prompt, question):
+def ask(model, system_prompt, pre_prompt, question, temperature=0.7):
     messages = [
         {'role': 'system', 'content': f"{system_prompt} {pre_prompt}"},
         {'role': 'user', 'content': f"{question}"},
     ]
     logger.debug(f"<< {model} << {question}")
 
-    chat_completion = client.chat.completions.create(messages=messages, model=model)
+    chat_completion = client.chat.completions.create(messages=messages, model=model, temperature=temperature)
     response = chat_completion.choices[0]
     answer = response.message.content
     logger.debug(f">> {model} >> {answer}")

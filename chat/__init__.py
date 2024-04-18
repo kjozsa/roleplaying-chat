@@ -5,7 +5,6 @@ from loguru import logger
 
 # from .ollamachat import ask, models
 from .togetherchat import ask, models
-
 # from .transformerschat import ask, models
 
 available_models = models()
@@ -44,13 +43,14 @@ def setup(scenario):
     col1, col2 = st.columns([1, 4])
     with col1:
         model = st.selectbox("model", available_models)
+        temperature = st.slider("temperature", min_value=0.0, max_value=1.0, value=0.7, key="temperature")
         max_steps = st.slider("max-steps", min_value=1, max_value=10, value=6, key="max-steps")
     with col2:
         st.text_area("pre-prompt", scenario.pre_prompt)
 
     st.divider()
     st.header("Outcome")
-    return model, max_steps
+    return model, max_steps, temperature
 
 
 def main():
@@ -75,18 +75,18 @@ def main():
         )]
 
     scenario = st.selectbox("scenario", scenarios)
-    model, max_steps = setup(scenario)
-    main_loop(max_steps, model, scenario)
+    model, max_steps, temperature = setup(scenario)
+    main_loop(max_steps, model, scenario, temperature)
 
 
-def main_loop(max_steps, model, scenario):
+def main_loop(max_steps, model, scenario, temperature):
     questioner = None
     question = scenario.task
     actor = target(scenario, question)
     for step, _ in enumerate(range(max_steps), start=1):
         with st.spinner(f"({step}/{max_steps}) Asking {actor.name}..."):
             extended = f"{questioner} asks: {question}" if questioner else question
-            answer = ask(model, actor.system_prompt, scenario.pre_prompt, extended)
+            answer = ask(model, actor.system_prompt, scenario.pre_prompt, extended, temperature=temperature)
             st.write(f":blue[{actor.name} says:] {answer}")
             question = sanitize(answer)
             questioner = actor.name
